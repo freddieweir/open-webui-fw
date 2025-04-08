@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  # Marqo service
+  marqo:
+    image: marqoai/marqo:latest
+    container_name: marqo
+    restart: always
+    ports:
+      - "8882:8882"
+    volumes:
+      - ./data/marqo:/app/data
+    environment:
+      - MARQO_MODE=COMBINED
+      - MARQO_LOG_LEVEL=INFO 

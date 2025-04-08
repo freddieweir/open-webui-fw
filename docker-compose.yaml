@@ -45,9 +45,26 @@ services:
       - SCARF_NO_ANALYTICS=${SCARF_NO_ANALYTICS}
       - DO_NOT_TRACK=${DO_NOT_TRACK}
       - ANONYMIZED_TELEMETRY=${ANONYMIZED_TELEMETRY}
+      - VECTOR_DB=marqo
+      - MARQO_URL=http://marqo:8882
     extra_hosts:
       - host.docker.internal:host-gateway
     restart: unless-stopped
+    depends_on:
+      - marqo
+
+  marqo:
+    image: marqoai/marqo:latest
+    container_name: marqo
+    restart: unless-stopped
+    volumes:
+      - ./data/marqo:/app/data
+    environment:
+      - MARQO_MODE=COMBINED
+      - MARQO_LOG_LEVEL=INFO
+    ports:
+      # Only expose internally, nginx will proxy if needed
+      - "8882:8882"
 
   watchtower:
     image: containrrr/watchtower
