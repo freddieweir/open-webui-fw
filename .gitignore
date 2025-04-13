@@ -329,3 +329,29 @@ letsencrypt/
 # Other potential sensitive files
 *.password
 *.secret
+
+# IP Address History
+.ip_address_history
+*.ip_history
+
+# API Keys and Tokens
+*.api_key
+*.token
+*.auth
+*_credentials
+*_creds
+
+# Configuration files with sensitive data
+*.config.local
+*.conf.local
+*_local.conf
+*_local.config
+
+# Other sensitive files
+*.password
+*.secret
+*.key
+*.pem
+*.crt
+*.pfx
+*.p12

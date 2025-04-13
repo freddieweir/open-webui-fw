@@ -59,4 +59,8 @@ if [ -f "$NGINX_CONF" ]; then
   fi
 fi
 
+# Track the IP address in the history
+echo -e "${YELLOW}Recording IP address in history...${NC}"
+python3 ~/git/Created/py-utils/ip_tracker.py
+
 echo -e "${GREEN}All done! Your Open WebUI should now be accessible.${NC}" 
