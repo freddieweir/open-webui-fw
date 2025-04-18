@@ -14,7 +14,10 @@ const config = {
 			pages: 'build',
 			assets: 'build',
 			fallback: 'index.html'
-		})
+		}),
+		paths: {
+			base: '/webui'
+		}
 	},
 	vitePlugin: {
 		// inspector: {

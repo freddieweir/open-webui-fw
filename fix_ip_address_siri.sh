@@ -37,7 +37,8 @@ PREV_IP=$(cat "$IP_HISTORY_FILE")
 if [ "$IP_ADDRESS" = "$PREV_IP" ] && [ ! -z "$PREV_IP" ] && [[ "$1" != "--force" ]]; then
     echo "Status: No Change"
     echo "IP: $IP_ADDRESS"
-    echo "Access: https://webui.local or https://$IP_ADDRESS"
+    echo "WebUI: https://atlantis.local/webui or https://$IP_ADDRESS/webui"
+    echo "VTuber: https://atlantis.local/vtuber or https://$IP_ADDRESS/vtuber"
     exit 0
 else
     # Save new IP
@@ -66,8 +67,8 @@ else
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
         -keyout "$KEY_FILE" \
         -out "$CERT_FILE" \
-        -subj "/CN=webui.local" \
-        -addext "subjectAltName=DNS:webui.local,DNS:localhost,IP:127.0.0.1,IP:$IP_ADDRESS" > /dev/null 2>&1
+        -subj "/CN=atlantis.local" \
+        -addext "subjectAltName=DNS:atlantis.local,DNS:localhost,IP:127.0.0.1,IP:$IP_ADDRESS" > /dev/null 2>&1
     
     if [ $? -eq 0 ]; then
         chmod 644 "$CERT_FILE"
@@ -79,5 +80,6 @@ else
     fi
     
     # Final access info
-    echo "Access: https://webui.local or https://$IP_ADDRESS"
+    echo "WebUI: https://atlantis.local/webui or https://$IP_ADDRESS/webui"
+    echo "VTuber: https://atlantis.local/vtuber or https://$IP_ADDRESS/vtuber"
 fi 

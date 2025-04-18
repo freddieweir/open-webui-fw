@@ -62,9 +62,11 @@ if [ "$IP_ADDRESS" = "$PREV_IP" ] && [ ! -z "$PREV_IP" ]; then
     if [[ "$1" != "--force" ]]; then
         echo
         echo -e "${BLUE}==== Connection Information ====${NC}"
-        echo -e "${GREEN}Open WebUI is accessible at:${NC}"
-        echo -e "  • ${YELLOW}https://webui.local${NC} (from this computer)"
-        echo -e "  • ${YELLOW}https://$IP_ADDRESS${NC} (from other devices on your network)"
+        echo -e "${GREEN}Services accessible at:${NC}"
+        echo -e "  • ${YELLOW}https://atlantis.local/webui${NC} (Open WebUI - This computer)"
+        echo -e "  • ${YELLOW}https://$IP_ADDRESS/webui${NC} (Open WebUI - Other devices)"
+        echo -e "  • ${YELLOW}https://atlantis.local/vtuber${NC} (Open-LLM-VTuber - This computer)"
+        echo -e "  • ${YELLOW}https://$IP_ADDRESS/vtuber${NC} (Open-LLM-VTuber - Other devices)"
         exit 0
     else
         echo -e "${YELLOW}Force flag detected. Proceeding with update anyway...${NC}"
@@ -93,8 +95,8 @@ mkdir -p "$SSL_DIR"
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -keyout "$KEY_FILE" \
     -out "$CERT_FILE" \
-    -subj "/CN=webui.local" \
-    -addext "subjectAltName=DNS:webui.local,DNS:localhost,IP:127.0.0.1,IP:$IP_ADDRESS"
+    -subj "/CN=atlantis.local" \
+    -addext "subjectAltName=DNS:atlantis.local,DNS:localhost,IP:127.0.0.1,IP:$IP_ADDRESS"
 
 # Check if certificate generation was successful
 if [ $? -eq 0 ]; then
@@ -115,9 +117,11 @@ fi
 # 4. Display connection information
 echo
 echo -e "${BLUE}==== Connection Information ====${NC}"
-echo -e "${GREEN}Open WebUI is now accessible at:${NC}"
-echo -e "  • ${YELLOW}https://webui.local${NC} (from this computer)"
-echo -e "  • ${YELLOW}https://$IP_ADDRESS${NC} (from other devices on your network)"
+echo -e "${GREEN}Services are now accessible at:${NC}"
+echo -e "  • ${YELLOW}https://atlantis.local/webui${NC} (Open WebUI - This computer)"
+echo -e "  • ${YELLOW}https://$IP_ADDRESS/webui${NC} (Open WebUI - Other devices)"
+echo -e "  • ${YELLOW}https://atlantis.local/vtuber${NC} (Open-LLM-VTuber - This computer)"
+echo -e "  • ${YELLOW}https://$IP_ADDRESS/vtuber${NC} (Open-LLM-VTuber - Other devices)"
 echo
 echo -e "${BLUE}Note:${NC} You may need to accept the security warning in your browser due to the self-signed certificate."
 echo -e "${GREEN}All IP address-related configurations have been successfully updated!${NC}" 
