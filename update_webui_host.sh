@@ -28,6 +28,9 @@ fi
 
 echo -e "${GREEN}Found IP address: ${IP_ADDRESS}${NC}"
 
+# Use IP-based hostname for external devices
+HOST_ENTRY="$IP_ADDRESS"
+
 # Check if atlantis.local is already in the hosts file
 if grep -q "atlantis.local" /etc/hosts; then
   echo -e "${YELLOW}Updating existing atlantis.local entry in hosts file...${NC}"
@@ -44,6 +47,8 @@ fi
 # Restart nginx container
 echo -e "${YELLOW}Restarting nginx container...${NC}"
 docker compose restart nginx
+
+echo -e "${GREEN}Hosts updated; use http://${IP_ADDRESS}/webui on other devices${NC}"
 
 echo -e "${GREEN}Done! atlantis.local has been updated to point to ${IP_ADDRESS}${NC}"
 echo -e "${YELLOW}You can now access Open WebUI at https://atlantis.local/webui${NC}"
