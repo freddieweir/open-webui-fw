@@ -128,6 +128,73 @@ def manage_ollama_models():
         input("Press Enter to continue...")
 
 
+# New curses-based manage function for arrow-key UI when invoked standalone
+def manage_ollama_models_curses(stdscr):
+    """Curses-based interactive menu for managing Ollama models using arrow keys."""
+    curses.curs_set(0)
+    curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_CYAN)
+    h, w = stdscr.getmaxyx()
+    items = [
+        "🔄 Pull a model from Ollama.com",
+        "🤖 Pull a model from HuggingFace.co",
+        "🗑️ Delete an existing Ollama model",
+        "↩️ Return to main menu",
+    ]
+    current = 0
+    while True:
+        stdscr.clear()
+        title = "🐙 Manage Ollama Models"
+        stdscr.attron(curses.A_BOLD)
+        stdscr.addstr(1, w // 2 - len(title) // 2, title)
+        stdscr.attroff(curses.A_BOLD)
+        for idx, item in enumerate(items):
+            x, y = 4, idx + 3
+            if idx == current:
+                stdscr.attron(curses.color_pair(2))
+                stdscr.addstr(y, x, item)
+                stdscr.attroff(curses.color_pair(2))
+            else:
+                stdscr.addstr(y, x, item)
+        key = stdscr.getch()
+        if key == curses.KEY_UP and current > 0:
+            current -= 1
+        elif key == curses.KEY_DOWN and current < len(items) - 1:
+            current += 1
+        elif key in [curses.KEY_ENTER, ord("\n")]:
+            break
+    # exit curses mode to perform actions
+    curses.endwin()
+    base_cmd = get_ollama_cmd()
+    if current == 0:
+        model = input("Enter model name to pull from Ollama.com: ").strip()
+        run_command(base_cmd + ["pull", model])
+    elif current == 1:
+        model = input("Enter HuggingFace model path (org/model): ").strip()
+        full = f"hf.co/{model}"
+        run_command(base_cmd + ["pull", full])
+    elif current == 2:
+        try:
+            output = subprocess.check_output(base_cmd + ["list"], text=True)
+            lines = output.splitlines()[1:]
+            models = [line.split()[0] for line in lines]
+            if not models:
+                print("No Ollama models found.")
+            else:
+                print("\nInstalled Ollama models:")
+                for idx, m in enumerate(models):
+                    print(f"  {idx+1}. {m}")
+                sel = input("Enter number of model to delete: ").strip()
+                if sel.isdigit() and 1 <= int(sel) <= len(models):
+                    to_delete = models[int(sel)-1]
+                    run_command(base_cmd + ["rm", to_delete])
+                else:
+                    print("Invalid selection.")
+        except Exception as e:
+            print(f"Error listing models: {e}")
+    # else Return chosen, nothing to do
+    input("Press Enter to exit...")
+
+
 def main(stdscr):
     curses.curs_set(0)
     curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_CYAN)
@@ -165,15 +232,16 @@ def main(stdscr):
             elif current == 3:
                 update_api_keys()
             elif current == 4:
-                manage_ollama_models()
+                # Use curses-based arrow-key UI for managing Ollama models
+                manage_ollama_models_curses(stdscr)
             elif current == 5:
                 break
         stdscr.refresh()
 
 if __name__ == "__main__":
-    # If called with 'ollama', directly run the Ollama model management menu
+    # If called with 'ollama', use arrow-key interactive curses menu
     if len(sys.argv) > 1 and sys.argv[1] == "ollama":
-        manage_ollama_models()
+        curses.wrapper(manage_ollama_models_curses)
         sys.exit(0)
     try:
         curses.wrapper(main)
