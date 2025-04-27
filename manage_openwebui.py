@@ -9,6 +9,7 @@ import subprocess
 import os
 import sys
 import shutil  # for locating local Ollama CLI binary
+import locale  # ensure Unicode support in curses
 
 ENV_FILE = os.path.join(os.getcwd(), ".env")
 FIX_IP_SCRIPT = os.path.join(os.getcwd(), "fix_ip_address.sh")
@@ -22,6 +23,8 @@ MENU = [
     "🚪 Exit",
 ]
 
+# Set locale for broad Unicode support
+locale.setlocale(locale.LC_ALL, '')
 
 def run_command(cmd):
     try:
@@ -132,6 +135,8 @@ def manage_ollama_models():
 def manage_ollama_models_curses(stdscr):
     """Curses-based interactive menu for managing Ollama models using arrow keys."""
     curses.curs_set(0)
+    # Initialize color support
+    curses.start_color()
     curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_CYAN)
     h, w = stdscr.getmaxyx()
     items = [
@@ -197,6 +202,8 @@ def manage_ollama_models_curses(stdscr):
 
 def main(stdscr):
     curses.curs_set(0)
+    # Initialize color support
+    curses.start_color()
     curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_CYAN)
     h, w = stdscr.getmaxyx()
     current = 0
