@@ -5,7 +5,7 @@ import sys
 from aiocache import cached
 from fastapi import Request
 
-from open_webui.routers import openai, ollama
+from open_webui.routers import openai, ollama, openrouter
 from open_webui.functions import get_function_models
 
 
@@ -34,6 +34,7 @@ async def get_all_base_models(request: Request, user: UserModel = None):
     function_models = []
     openai_models = []
     ollama_models = []
+    openrouter_models = []
 
     if request.app.state.config.ENABLE_OPENAI_API:
         openai_models = await openai.get_all_models(request, user=user)
@@ -53,8 +54,23 @@ async def get_all_base_models(request: Request, user: UserModel = None):
             for model in ollama_models["models"]
         ]
 
+    # Include OpenRouter models
+    if request.app.state.config.ENABLE_OPENROUTER_API:
+        openrouter_models = await openrouter.get_all_models(request, user=user)
+        openrouter_models = [
+            {
+                "id": model["id"],
+                "name": model.get("name", model.get("id")),
+                "object": "model",
+                "created": int(time.time()),
+                "owned_by": "openrouter",
+                "openrouter": model,
+            }
+            for model in openrouter_models.get("data", [])
+        ]
+
     function_models = await get_function_models(request)
-    models = function_models + openai_models + ollama_models
+    models = function_models + openai_models + ollama_models + openrouter_models
 
     return models
 

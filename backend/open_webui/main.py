@@ -76,6 +76,7 @@ from open_webui.routers import (
     tools,
     users,
     utils,
+    openrouter,
 )
 
 from open_webui.routers.retrieval import (
@@ -102,6 +103,11 @@ from open_webui.config import (
     OPENAI_API_BASE_URLS,
     OPENAI_API_KEYS,
     OPENAI_API_CONFIGS,
+    # OpenRouter
+    ENABLE_OPENROUTER_API,
+    OPENROUTER_API_BASE_URLS,
+    OPENROUTER_API_KEYS,
+    OPENROUTER_API_CONFIGS,
     # Direct Connections
     ENABLE_DIRECT_CONNECTIONS,
     # Code Execution
@@ -868,6 +874,8 @@ app.mount("/ws", socket_app)
 
 app.include_router(ollama.router, prefix="/ollama", tags=["ollama"])
 app.include_router(openai.router, prefix="/openai", tags=["openai"])
+app.include_router(openrouter.router, prefix="/openrouter", tags=["openrouter"])
+app.include_router(retrieval.router, prefix="/api/v1/retrieval", tags=["retrieval"])
 
 
 app.include_router(pipelines.router, prefix="/api/v1/pipelines", tags=["pipelines"])
@@ -875,8 +883,6 @@ app.include_router(tasks.router, prefix="/api/v1/tasks", tags=["tasks"])
 app.include_router(images.router, prefix="/api/v1/images", tags=["images"])
 
 app.include_router(audio.router, prefix="/api/v1/audio", tags=["audio"])
-app.include_router(retrieval.router, prefix="/api/v1/retrieval", tags=["retrieval"])
-
 app.include_router(configs.router, prefix="/api/v1/configs", tags=["configs"])
 
 app.include_router(auths.router, prefix="/api/v1/auths", tags=["auths"])
