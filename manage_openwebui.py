@@ -59,7 +59,11 @@ def update_api_keys():
 
 # New function to manage pulling and deleting Ollama models
 def manage_ollama_models():
-    curses.endwin()
+    # Safely end curses mode if initialized
+    try:
+        curses.endwin()
+    except curses.error:
+        pass
     while True:
         print("\n=== 🐙 Manage Ollama Models ===")
         print("1. 🔄 Pull a model from Ollama.com")
@@ -143,6 +147,10 @@ def main(stdscr):
         stdscr.refresh()
 
 if __name__ == "__main__":
+    # If called with 'ollama', directly run the Ollama model management menu
+    if len(sys.argv) > 1 and sys.argv[1] == "ollama":
+        manage_ollama_models()
+        sys.exit(0)
     try:
         curses.wrapper(main)
     except Exception as e:
