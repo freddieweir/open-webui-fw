@@ -8,6 +8,7 @@ import curses
 import subprocess
 import os
 import sys
+import shutil  # for locating local Ollama CLI binary
 
 ENV_FILE = os.path.join(os.getcwd(), ".env")
 FIX_IP_SCRIPT = os.path.join(os.getcwd(), "fix_ip_address.sh")
@@ -57,6 +58,27 @@ def update_api_keys():
     input("Press Enter to return to menu...")
 
 
+# Helper to determine how to invoke the Ollama CLI: check for Docker container first, then local binary
+def get_ollama_cmd():
+    # If a Docker container named 'ollama' is running, use it
+    try:
+        result = subprocess.run(
+            ["docker", "ps", "--filter", "name=ollama", "--format", "{{.Names}}"],
+            capture_output=True, text=True, check=False
+        )
+        names = result.stdout.strip().splitlines()
+        if "ollama" in names:
+            return ["docker", "exec", "ollama", "ollama"]
+    except Exception:
+        pass
+    # Fallback to local Ollama CLI if installed via Homebrew
+    if shutil.which("ollama"):
+        return ["ollama"]
+    # No Ollama CLI found
+    print("⚠️  Ollama CLI not found. Please install via Homebrew: brew install ollama")
+    sys.exit(1)
+
+
 # New function to manage pulling and deleting Ollama models
 def manage_ollama_models():
     # Safely end curses mode if initialized
@@ -64,6 +86,8 @@ def manage_ollama_models():
         curses.endwin()
     except curses.error:
         pass
+    # Determine how to call Ollama (docker container or local binary)
+    base_cmd = get_ollama_cmd()
     while True:
         print("\n=== 🐙 Manage Ollama Models ===")
         print("1. 🔄 Pull a model from Ollama.com")
@@ -73,14 +97,14 @@ def manage_ollama_models():
         choice = input("Enter choice [1-4]: ").strip()
         if choice == "1":
             model = input("Enter model name to pull from Ollama.com: ").strip()
-            run_command(["docker", "exec", "ollama", "ollama", "pull", model])
+            run_command(base_cmd + ["pull", model])
         elif choice == "2":
             model = input("Enter HuggingFace model path (org/model) to pull: ").strip()
             full = f"hf.co/{model}"
-            run_command(["docker", "exec", "ollama", "ollama", "pull", full])
+            run_command(base_cmd + ["pull", full])
         elif choice == "3":
             try:
-                output = subprocess.check_output(["docker", "exec", "ollama", "ollama", "list"], text=True)
+                output = subprocess.check_output(base_cmd + ["list"], text=True)
                 lines = output.splitlines()[1:]
                 models = [line.split()[0] for line in lines]
                 if not models:
@@ -92,7 +116,7 @@ def manage_ollama_models():
                     sel = input("Enter number of model to delete: ").strip()
                     if sel.isdigit() and 1 <= int(sel) <= len(models):
                         to_delete = models[int(sel)-1]
-                        run_command(["docker", "exec", "ollama", "ollama", "rm", to_delete])
+                        run_command(base_cmd + ["rm", to_delete])
                     else:
                         print("Invalid selection.")
             except Exception as e:
