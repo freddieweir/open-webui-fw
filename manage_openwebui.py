@@ -20,11 +20,25 @@ MENU = [
     "🌐 Fix IP Address",
     "🔑 Update API Keys (.env)",
     "🐙 Manage Ollama Models",
+    "🔄 Restart Ollama",
+    "🔄 Restart Both Services",
     "🚪 Exit",
 ]
 
 # Set locale for broad Unicode support
 locale.setlocale(locale.LC_ALL, '')
+
+# Utility for safely printing Unicode or wide strings in curses windows
+def safe_addstr(win, y, x, text):
+    try:
+        win.addstr(y, x, text)
+    except curses.error:
+        # Strip non-ASCII characters as fallback
+        ascii_text = ''.join(ch for ch in text if ord(ch) < 128)
+        try:
+            win.addstr(y, x, ascii_text)
+        except curses.error:
+            pass
 
 def run_command(cmd):
     try:
@@ -150,16 +164,16 @@ def manage_ollama_models_curses(stdscr):
         stdscr.clear()
         title = "🐙 Manage Ollama Models"
         stdscr.attron(curses.A_BOLD)
-        stdscr.addstr(1, w // 2 - len(title) // 2, title)
+        safe_addstr(stdscr, 1, w // 2 - len(title) // 2, title)
         stdscr.attroff(curses.A_BOLD)
         for idx, item in enumerate(items):
             x, y = 4, idx + 3
             if idx == current:
                 stdscr.attron(curses.color_pair(2))
-                stdscr.addstr(y, x, item)
+                safe_addstr(stdscr, y, x, item)
                 stdscr.attroff(curses.color_pair(2))
             else:
-                stdscr.addstr(y, x, item)
+                safe_addstr(stdscr, y, x, item)
         key = stdscr.getch()
         if key == curses.KEY_UP and current > 0:
             current -= 1
@@ -200,6 +214,32 @@ def manage_ollama_models_curses(stdscr):
     input("Press Enter to exit...")
 
 
+def restart_ollama():
+    """Restart Ollama service based on installation method."""
+    try:
+        # Check if running in Docker
+        result = subprocess.run(
+            ["docker", "ps", "--filter", "name=ollama", "--format", "{{.Names}}"],
+            capture_output=True, text=True, check=False
+        )
+        names = result.stdout.strip().splitlines()
+        if "ollama" in names:
+            # Restart Docker container
+            run_command(["docker", "restart", "ollama"])
+        else:
+            # Restart local Ollama service
+            run_command(["brew", "services", "restart", "ollama"])
+    except Exception as e:
+        print(f"Error restarting Ollama: {e}")
+        input("Press Enter to continue...")
+
+def restart_both_services():
+    """Restart both Open WebUI and Ollama services."""
+    restart_ollama()
+    run_command(["docker", "compose", "restart", "open-webui"])
+    print("Both services have been restarted.")
+    input("Press Enter to continue...")
+
 def main(stdscr):
     curses.curs_set(0)
     # Initialize color support
@@ -211,17 +251,17 @@ def main(stdscr):
         stdscr.clear()
         title = "🛡️  Open WebUI Manager"
         stdscr.attron(curses.A_BOLD)
-        stdscr.addstr(1, w//2 - len(title)//2, title)
+        safe_addstr(stdscr, 1, w//2 - len(title)//2, title)
         stdscr.attroff(curses.A_BOLD)
         for idx, item in enumerate(MENU):
             x = 4
             y = idx + 4
             if idx == current:
                 stdscr.attron(curses.color_pair(1))
-                stdscr.addstr(y, x, item)
+                safe_addstr(stdscr, y, x, item)
                 stdscr.attroff(curses.color_pair(1))
             else:
-                stdscr.addstr(y, x, item)
+                safe_addstr(stdscr, y, x, item)
         key = stdscr.getch()
         if key == curses.KEY_UP and current > 0:
             current -= 1
@@ -231,18 +271,21 @@ def main(stdscr):
             stdscr.clear()
             stdscr.refresh()
             if current == 0:
-                run_command(["docker", "compose", "restart", "open-webui"] )
+                run_command(["docker", "compose", "restart", "open-webui"])
             elif current == 1:
-                run_command(["docker", "compose", "up", "--build", "-d"] )
+                run_command(["docker", "compose", "up", "--build", "-d"])
             elif current == 2:
                 run_command([FIX_IP_SCRIPT])
             elif current == 3:
                 update_api_keys()
             elif current == 4:
-                # Use curses-based arrow-key UI for managing Ollama models
                 manage_ollama_models_curses(stdscr)
             elif current == 5:
-                break
+                restart_ollama()
+            elif current == 6:
+                restart_both_services()
+            elif current == 7:
+                sys.exit(0)
         stdscr.refresh()
 
 if __name__ == "__main__":
