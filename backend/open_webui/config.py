@@ -842,6 +842,53 @@ except Exception:
 OPENAI_API_BASE_URL = "https://api.openai.com/v1"
 
 ####################################
+# OPENROUTER_API
+####################################
+
+ENABLE_OPENROUTER_API = PersistentConfig(
+    "ENABLE_OPENROUTER_API",
+    "openrouter.enable",
+    os.environ.get("ENABLE_OPENROUTER_API", "True").lower() == "true",
+)
+
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+OPENROUTER_API_BASE_URL = os.environ.get("OPENROUTER_API_BASE_URL", "")
+if OPENROUTER_API_BASE_URL == "":
+    OPENROUTER_API_BASE_URL = "https://openrouter.ai/api/v1"
+
+OPENROUTER_API_KEYS = os.environ.get("OPENROUTER_API_KEYS", "")
+OPENROUTER_API_KEYS = (
+    OPENROUTER_API_KEYS
+    if OPENROUTER_API_KEYS != ""
+    else OPENROUTER_API_KEY
+)
+OPENROUTER_API_KEYS = [key.strip() for key in OPENROUTER_API_KEYS.split(";")]
+OPENROUTER_API_KEYS = PersistentConfig(
+    "OPENROUTER_API_KEYS",
+    "openrouter.api_keys",
+    OPENROUTER_API_KEYS,
+)
+
+OPENROUTER_API_BASE_URLS = os.environ.get("OPENROUTER_API_BASE_URLS", "")
+OPENROUTER_API_BASE_URLS = (
+    OPENROUTER_API_BASE_URLS
+    if OPENROUTER_API_BASE_URLS != ""
+    else OPENROUTER_API_BASE_URL
+)
+OPENROUTER_API_BASE_URLS = [url.strip() for url in OPENROUTER_API_BASE_URLS.split(";")]
+OPENROUTER_API_BASE_URLS = PersistentConfig(
+    "OPENROUTER_API_BASE_URLS",
+    "openrouter.api_base_urls",
+    OPENROUTER_API_BASE_URLS,
+)
+
+OPENROUTER_API_CONFIGS = PersistentConfig(
+    "OPENROUTER_API_CONFIGS",
+    "openrouter.api_configs",
+    {},
+)
+
+####################################
 # WEBUI
 ####################################
 

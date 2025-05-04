@@ -355,3 +355,7 @@ letsencrypt/
 *.crt
 *.pfx
 *.p12
+
+# Ignore VSCode workspace files and cursor directory
+*.code-workspace
+.cursor/
