@@ -10,6 +10,7 @@ import os
 import sys
 import shutil  # for locating local Ollama CLI binary
 import locale  # ensure Unicode support in curses
+import psutil  # for checking if Ollama.app is running
 
 ENV_FILE = os.path.join(os.getcwd(), ".env")
 FIX_IP_SCRIPT = os.path.join(os.getcwd(), "fix_ip_address.sh")
@@ -227,8 +228,29 @@ def restart_ollama():
             # Restart Docker container
             run_command(["docker", "restart", "ollama"])
         else:
-            # Restart local Ollama service
-            run_command(["brew", "services", "restart", "ollama"])
+            # Check if Ollama.app is running (standalone app)
+            ollama_app_proc = None
+            for proc in psutil.process_iter(['pid', 'name', 'exe', 'cmdline']):
+                try:
+                    if proc.info['exe'] and 'Ollama.app' in proc.info['exe']:
+                        ollama_app_proc = proc
+                        break
+                    if proc.info['cmdline'] and any('Ollama.app' in str(arg) for arg in proc.info['cmdline']):
+                        ollama_app_proc = proc
+                        break
+                except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                    continue
+            if ollama_app_proc:
+                print("🔄 Restarting Ollama.app (standalone)...")
+                ollama_app_proc.terminate()
+                ollama_app_proc.wait(timeout=10)
+                # Relaunch the app
+                app_path = "/Applications/Ollama.app"
+                subprocess.Popen(["open", app_path])
+                print("Ollama.app has been restarted!")
+            else:
+                # Fallback to Homebrew service
+                run_command(["brew", "services", "restart", "ollama"])
     except Exception as e:
         print(f"Error restarting Ollama: {e}")
         input("Press Enter to continue...")
