@@ -22,7 +22,7 @@ Run the interactive configuration manager:
 python3 manage_openrouter.py
 ```
 
-This will launch a colorful, ADHD-friendly interface with arrow key navigation to:
+This will launch a colorful, user-friendly interface with menu navigation to:
 - ✅ Configure your OpenRouter API key
 - 🧪 Test the connection
 - 🔍 Browse available models
@@ -54,17 +54,49 @@ This will launch a colorful, ADHD-friendly interface with arrow key navigation t
    docker-compose up -d
    ```
 
-## 🔍 Using Perplexity for Web Search
+## 🔍 Adding OpenRouter Models in Open WebUI
 
-Once configured, you can use Perplexity Sonar models for real-time web search:
+**Important:** OpenRouter models are added as **Direct Connections** in Open WebUI, not automatically loaded. This is by design for performance and cost control.
 
-### Available Perplexity Models:
-- `perplexity/llama-3.1-sonar-small-128k-online`
+### Step-by-Step Process:
+
+1. **Open Open WebUI** in your browser (`http://localhost`)
+
+2. **Access Model Management:**
+   - Click on your profile/settings
+   - Go to **Admin Panel** → **Settings** → **Connections**
+   - Or look for **"Manage Direct Connections"**
+
+3. **Add OpenRouter Connection:**
+   - Click **"+"** to add a new connection
+   - **URL:** `https://openrouter.ai/api/v1`
+   - **API Key:** Your OpenRouter API key
+   - **Name:** Give it a descriptive name (e.g., "Perplexity Sonar Pro")
+
+4. **Test the Connection:**
+   - Click the test button to verify it works
+   - You should see "success" ✅
+
+5. **The model is now available** in your model selector dropdown!
+
+### Popular OpenRouter Models to Add:
+
+**For Web Search:**
 - `perplexity/llama-3.1-sonar-large-128k-online`
 - `perplexity/llama-3.1-sonar-huge-128k-online`
+- `perplexity/llama-3.1-sonar-small-128k-online`
+
+**For General Use:**
+- `anthropic/claude-3.5-sonnet`
+- `openai/gpt-4o`
+- `meta-llama/llama-3.1-405b-instruct`
+
+## 🔍 Using Perplexity for Web Search
+
+Once you've added a Perplexity Sonar model:
 
 ### Example Usage:
-1. Select a Perplexity Sonar model in Open WebUI
+1. Select the Perplexity Sonar model in Open WebUI
 2. Ask questions that require current information:
    - "What are the latest developments in AI this week?"
    - "Current stock price of NVIDIA"
@@ -111,7 +143,7 @@ curl -H "Authorization: Bearer YOUR_API_KEY" \
 
 The `manage_openrouter.py` script provides:
 
-- **🎮 Arrow Key Navigation** - ADHD-friendly interface
+- **🎮 Menu Navigation** - User-friendly interface
 - **🔧 Easy Configuration** - Step-by-step setup
 - **🧪 Connection Testing** - Verify your setup works
 - **🔍 Model Browser** - See available models
@@ -131,14 +163,15 @@ The `manage_openrouter.py` script provides:
 
 ### Common Issues
 
-**❌ "No API key configured"**
-- Solution: Run the management script and configure your API key
+**❌ "Models not appearing automatically"**
+- **This is normal!** OpenRouter models must be added manually as Direct Connections
+- Follow the "Adding OpenRouter Models" section above
 
 **❌ "Connection failed: HTTP 401"**
 - Solution: Check your API key is correct and active
 
-**❌ "Models not appearing in Open WebUI"**
-- Solution: Restart Docker services after configuration
+**❌ "CORS errors"**
+- Solution: This is normal for Direct Connections, the models should still work
 
 **❌ "Permission denied on script"**
 - Solution: `chmod +x manage_openrouter.py`
@@ -176,11 +209,11 @@ The `manage_openrouter.py` script provides:
 
 ## 💡 Pro Tips
 
-1. **Start with free models** to test your setup
+1. **Add models one by one** to control costs and performance
 2. **Use Perplexity Sonar** for questions requiring current information
 3. **Monitor your usage** to avoid unexpected costs
-4. **Bookmark the management script** for easy configuration updates
-5. **Set up multiple API keys** for load balancing (advanced)
+4. **Give models descriptive names** when adding them as Direct Connections
+5. **Test each model** after adding to ensure it works correctly
 
 ## 🆘 Getting Help
 
