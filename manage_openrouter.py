@@ -16,12 +16,12 @@ sys.path.insert(0, os.path.expanduser("~/py-utils"))
 
 try:
     import module_venv
-    # Setup virtual environment
-    venv_path = os.path.expanduser("~/venv/openrouter-manager")
-    module_venv.setup_venv(venv_path, ["python-dotenv", "requests", "rich", "keyboard"])
-    
-    # Activate the virtual environment
-    module_venv.activate_venv(venv_path)
+    # Setup virtual environment with auto-switching
+    auto_venv = module_venv.AutoVirtualEnvironment(
+        custom_name="openrouter-manager",
+        auto_packages=["python-dotenv", "requests", "rich", "keyboard"]
+    )
+    auto_venv.auto_switch()
 except ImportError:
     print("⚠️  Warning: module_venv not found. Installing dependencies globally...")
 
