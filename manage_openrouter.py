@@ -2,18 +2,18 @@
 """
 OpenRouter Backend Configuration Manager for Open WebUI
 
-🎯 PURPOSE: Configure the BACKEND authentication and API settings for OpenRouter
+PURPOSE: Configure the BACKEND authentication and API settings for OpenRouter
    - This script sets up the Docker environment variables needed for authentication
    - After running this, you still need to manually add specific models in the Open WebUI interface
-   - Think of this as "setting up your internet connection" before "choosing which apps to install"
+   - This establishes authentication before selecting specific models
 
-📋 WORKFLOW:
+WORKFLOW:
    1. Run this script to configure backend API authentication
    2. Restart Docker to load the new environment variables  
    3. Manually add specific models in Open WebUI Admin Panel → Connections
    4. Models will then appear in your model selector dropdown
 
-🔑 WHY BOTH ARE NEEDED:
+WHY BOTH ARE NEEDED:
    - This script: Provides the API key so Docker can authenticate with OpenRouter
    - Manual UI: Tells Open WebUI which specific models you want to use
    - Without this script: Manual UI model addition will fail with authentication errors
@@ -96,9 +96,9 @@ class OpenRouterManager:
         """Display the application header"""
         console.clear()
         header = Panel(
-            "🔧 OpenRouter Backend Configuration Manager\n" +
-            "🎯 Purpose: Configure API authentication for Docker container\n" +
-            "📋 Next Step: Manually add specific models in Open WebUI interface",
+            "OpenRouter Backend Configuration Manager\n" +
+            "Purpose: Configure API authentication for Docker container\n" +
+            "Next Step: Manually add specific models in Open WebUI interface",
             style="bold bright_blue"
         )
         console.print(header)
@@ -106,11 +106,11 @@ class OpenRouterManager:
     def show_workflow_info(self):
         """Display the workflow information"""
         workflow = Panel(
-            "📋 Complete Workflow:\n" +
-            "1. 🔧 Configure API key (this script)\n" +
-            "2. 🐳 Restart Docker services (this script)\n" +
-            "3. 🖥️  Add specific models in UI (Admin Panel → Connections)\n" +
-            "4. ✅ Models appear in Open WebUI dropdown",
+            "Complete Workflow:\n" +
+            "1. Configure API key (this script)\n" +
+            "2. Restart Docker services (this script)\n" +
+            "3. Add specific models in UI (Admin Panel → Connections)\n" +
+            "4. Models appear in Open WebUI dropdown",
             title="How OpenRouter Integration Works",
             style="bright_cyan"
         )
@@ -125,73 +125,73 @@ class OpenRouterManager:
         
         # API Status
         api_enabled = self.config['ENABLE_OPENROUTER_API'].lower() == 'true'
-        status_table.add_row("🔌 API Enabled", self.config['ENABLE_OPENROUTER_API'], "✅ Ready" if api_enabled else "❌ Disabled")
+        status_table.add_row("API Enabled", self.config['ENABLE_OPENROUTER_API'], "Ready" if api_enabled else "Disabled")
         
         # API Key Status
         key = self.config['OPENROUTER_API_KEY']
         if key:
             masked_key = f"{key[:8]}...{key[-4:]}" if len(key) > 12 else key
-            status = "✅ Configured"
+            status = "Configured"
         else:
             masked_key = "Not set"
-            status = "❌ Missing"
-        status_table.add_row("🔑 API Key", masked_key, status)
+            status = "Missing"
+        status_table.add_row("API Key", masked_key, status)
         
         # Base URL
-        status_table.add_row("🌐 Base URL", self.config['OPENROUTER_API_BASE_URL'], "✅ Set")
+        status_table.add_row("Base URL", self.config['OPENROUTER_API_BASE_URL'], "Set")
         
         # Next steps
         if key and api_enabled:
-            next_step = "✅ Ready for UI model addition"
+            next_step = "Ready for UI model addition"
         else:
-            next_step = "⚠️  Configure API key first"
-        status_table.add_row("📋 Next Step", "Add models in UI", next_step)
+            next_step = "Configure API key first"
+        status_table.add_row("Next Step", "Add models in UI", next_step)
         
         console.print(status_table)
 
     def show_menu(self):
         """Display the main menu"""
-        console.print("\n🎯 Backend Configuration Menu:")
-        console.print("1. 🔧 Configure OpenRouter API Authentication")
-        console.print("2. 📊 View Current Backend Configuration")
-        console.print("3. 🧪 Test OpenRouter API Connection")
-        console.print("4. 🌐 Discover & Queue Models for UI Addition")
-        console.print("5. 📋 View Queued Models & Copy Instructions")
-        console.print("6. 🐳 Restart Docker Services")
-        console.print("7. 📝 Generate .env Template")
-        console.print("8. ❓ Help & UI Addition Guide")
-        console.print("9. 🚪 Exit")
+        console.print("\nBackend Configuration Menu:")
+        console.print("1. Configure OpenRouter API Authentication")
+        console.print("2. View Current Backend Configuration")
+        console.print("3. Test OpenRouter API Connection")
+        console.print("4. Discover & Queue Models for UI Addition")
+        console.print("5. View Queued Models & Copy Instructions")
+        console.print("6. Restart Docker Services")
+        console.print("7. Generate .env Template")
+        console.print("8. Help & UI Addition Guide")
+        console.print("9. Exit")
 
     def configure_api(self):
         """Configure OpenRouter API settings"""
         console.clear()
-        console.print(Panel("🔧 OpenRouter Backend API Configuration", style="bold bright_blue"))
+        console.print(Panel("OpenRouter Backend API Configuration", style="bold bright_blue"))
         
         # Enable/Disable API
         current_enabled = self.config['ENABLE_OPENROUTER_API'].lower() == 'true'
-        enable_api = Confirm.ask(f"Enable OpenRouter API? (currently: {'✅ enabled' if current_enabled else '❌ disabled'})", 
+        enable_api = Confirm.ask(f"Enable OpenRouter API? (currently: {'enabled' if current_enabled else 'disabled'})", 
                                default=current_enabled)
         self.config['ENABLE_OPENROUTER_API'] = 'true' if enable_api else 'false'
         
         if enable_api:
             # API Key
-            console.print("\n🔑 API Key Configuration")
+            console.print("\nAPI Key Configuration")
             current_key = self.config['OPENROUTER_API_KEY']
             if current_key:
                 console.print(f"Current key: {current_key[:8]}...{current_key[-4:] if len(current_key) > 12 else current_key}")
                 update_key = Confirm.ask("Update API key?", default=False)
             else:
-                console.print("❌ No API key configured")
+                console.print("No API key configured")
                 update_key = True
             
             if update_key:
                 new_key = Prompt.ask("Enter your OpenRouter API key", password=True)
                 if new_key.strip():
                     self.config['OPENROUTER_API_KEY'] = new_key.strip()
-                    console.print("✅ API key updated", style="bright_green")
+                    console.print("API key updated", style="bright_green")
             
             # Base URL
-            console.print("\n🌐 Base URL Configuration")
+            console.print("\nBase URL Configuration")
             current_url = self.config['OPENROUTER_API_BASE_URL']
             console.print(f"Current URL: {current_url}")
             
@@ -201,8 +201,8 @@ class OpenRouterManager:
         
         # Save configuration
         self.save_config()
-        console.print("\n💾 Backend configuration saved!", style="bright_green")
-        console.print("📋 Next step: Restart Docker and add models in UI", style="bright_cyan")
+        console.print("\nBackend configuration saved", style="bright_green")
+        console.print("Next step: Restart Docker and add models in UI", style="bright_cyan")
         input("\nPress Enter to continue...")
 
     def view_config(self):
@@ -217,34 +217,34 @@ class OpenRouterManager:
         
         # API Enabled
         enabled = self.config['ENABLE_OPENROUTER_API'].lower() == 'true'
-        config_table.add_row("API Enabled", self.config['ENABLE_OPENROUTER_API'], "✅ Ready" if enabled else "❌ Disabled")
+        config_table.add_row("API Enabled", self.config['ENABLE_OPENROUTER_API'], "Ready" if enabled else "Disabled")
         
         # API Key
         key = self.config['OPENROUTER_API_KEY']
         if key:
             masked_key = f"{key[:8]}...{key[-4:]}" if len(key) > 12 else key
-            status = "✅ Configured"
+            status = "Configured"
         else:
             masked_key = "Not set"
-            status = "❌ Missing"
+            status = "Missing"
         config_table.add_row("API Key", masked_key, status)
         
         # Base URL
-        config_table.add_row("Base URL", self.config['OPENROUTER_API_BASE_URL'], "✅ Set")
+        config_table.add_row("Base URL", self.config['OPENROUTER_API_BASE_URL'], "Set")
         
         console.print(config_table)
         
         # Environment file status
         if self.env_file.exists():
-            console.print(f"\n📁 Configuration file: {self.env_file.absolute()}", style="bright_cyan")
+            console.print(f"\nConfiguration file: {self.env_file.absolute()}", style="bright_cyan")
         else:
-            console.print("\n⚠️  No .env file found", style="bright_red")
+            console.print("\nNo .env file found", style="bright_red")
         
         # Next steps
         if key and enabled:
-            console.print("\n✅ Backend ready! Next: Add models in Open WebUI interface", style="bright_green")
+            console.print("\nBackend ready. Next: Add models in Open WebUI interface", style="bright_green")
         else:
-            console.print("\n⚠️  Configure API key to proceed", style="bright_yellow")
+            console.print("\nConfigure API key to proceed", style="bright_yellow")
         
         input("\nPress Enter to continue...")
 
@@ -274,13 +274,13 @@ class OpenRouterManager:
             if response.status_code == 200:
                 data = response.json()
                 model_count = len(data.get('data', []))
-                console.print(f"✅ Backend connection successful!", style="bright_green")
-                console.print(f"📊 API authenticated with access to {model_count} models", style="bright_cyan")
-                console.print("🎯 Ready for UI model addition!", style="bright_green")
+                console.print(f"Backend connection successful", style="bright_green")
+                console.print(f"API authenticated with access to {model_count} models", style="bright_cyan")
+                console.print("Ready for UI model addition", style="bright_green")
                 
                 # Show a few example models for reference
                 if model_count > 0:
-                    console.print("\n🤖 Sample models available:")
+                    console.print("\nSample models available:")
                     for model in data['data'][:3]:
                         console.print(f"  • {model.get('id', 'Unknown')}", style="dim white")
                     console.print(f"  ... and {model_count - 3} more", style="dim white")
@@ -306,20 +306,20 @@ class OpenRouterManager:
             input("\nPress Enter to continue...")
             return
         
-        console.print("🎯 This will restart Open WebUI with your new OpenRouter configuration", style="bright_cyan")
+        console.print("This will restart Open WebUI with your new OpenRouter configuration", style="bright_cyan")
         
         if Confirm.ask("Restart Open WebUI Docker services?"):
             try:
-                console.print("🔄 Stopping services...", style="bright_yellow")
+                console.print("Stopping services...", style="bright_yellow")
                 # Stop services
                 subprocess.run(['docker-compose', 'down'], check=True, capture_output=True)
-                console.print("🔄 Starting services with new configuration...", style="bright_yellow")
+                console.print("Starting services with new configuration...", style="bright_yellow")
                 # Start services
                 subprocess.run(['docker-compose', 'up', '-d'], check=True, capture_output=True)
                 
-                console.print("✅ Services restarted successfully!", style="bright_green")
-                console.print("🌐 Open WebUI available at: http://localhost", style="bright_cyan")
-                console.print("📋 Next: Add specific models in Admin Panel → Connections", style="bright_yellow")
+                console.print("Services restarted successfully", style="bright_green")
+                console.print("Open WebUI available at: http://localhost", style="bright_cyan")
+                console.print("Next: Add specific models in Admin Panel → Connections", style="bright_yellow")
                 
             except subprocess.CalledProcessError as e:
                 console.print(f"❌ Failed to restart services: {e}", style="bright_red")
@@ -367,9 +367,9 @@ WEBUI_DOCKER_TAG=main
         with open(self.env_file, 'w') as f:
             f.write(template)
         
-        console.print(f"✅ Template generated: {self.env_file.absolute()}", style="bright_green")
-        console.print("\n📝 Please edit the file and add your actual API keys", style="bright_cyan")
-        console.print("📋 Remember: This is only the backend configuration", style="bright_yellow")
+        console.print(f"Template generated: {self.env_file.absolute()}", style="bright_green")
+        console.print("\nPlease edit the file and add your actual API keys", style="bright_cyan")
+        console.print("Remember: This is only the backend configuration", style="bright_yellow")
         
         input("\nPress Enter to continue...")
 
@@ -680,7 +680,7 @@ WEBUI_DOCKER_TAG=main
         console.print(queue_table)
         
         # Show copy-paste instructions
-        console.print("\n📋 UI Addition Instructions:")
+        console.print("\nUI Addition Instructions:")
         instruction_panel = Panel(
             "1. Go to Open WebUI → Admin Panel → Settings → Connections\n" +
             "2. Click '+' to add a new Direct Connection\n" +
@@ -694,7 +694,7 @@ WEBUI_DOCKER_TAG=main
         console.print(instruction_panel)
         
         # Action menu
-        console.print("\n🎯 Actions:")
+        console.print("\nActions:")
         console.print("• Enter model numbers to remove (e.g., '1,3,5')")
         console.print("• Type 'export' to save to file")
         console.print("• Type 'clear' to clear all")
@@ -763,10 +763,10 @@ WEBUI_DOCKER_TAG=main
     def show_help(self):
         """Show help and UI addition guide"""
         console.clear()
-        console.print(Panel("❓ OpenRouter Backend Configuration & UI Addition Guide", style="bold bright_blue"))
+        console.print(Panel("OpenRouter Backend Configuration & UI Addition Guide", style="bold bright_blue"))
         
         help_content = """
-🎯 UNDERSTANDING THE TWO-STEP PROCESS:
+UNDERSTANDING THE TWO-STEP PROCESS:
 
 Step 1: Backend Configuration (This Script)
 • Sets up API authentication in Docker environment
@@ -778,13 +778,13 @@ Step 2: UI Model Addition (Manual Process)
 • Creates "Direct Connections" for individual models
 • Required for models to appear in the dropdown selector
 
-🔧 BACKEND CONFIGURATION (This Script):
+BACKEND CONFIGURATION (This Script):
 1. Configure your OpenRouter API key
 2. Test the connection to verify it works
 3. Restart Docker services to load new environment
-4. ✅ Backend is now ready for UI model addition
+4. Backend is now ready for UI model addition
 
-🖥️  UI MODEL ADDITION (Manual Process):
+UI MODEL ADDITION (Manual Process):
 1. Open your browser → http://localhost
 2. Go to Admin Panel → Settings → Connections
 3. Click '+' to add a new Direct Connection
@@ -793,17 +793,17 @@ Step 2: UI Model Addition (Manual Process)
    • API Key: Your OpenRouter API key
    • Name: A friendly name (e.g., "Perplexity Web Search")
    • Model: The exact model ID (e.g., "perplexity/llama-3.1-sonar-large-128k-online")
-5. Test the connection (should show ✅ success)
-6. ✅ Model now appears in your dropdown selector
+5. Test the connection (should show success)
+6. Model now appears in your dropdown selector
 
-🔍 RECOMMENDED WORKFLOW:
+RECOMMENDED WORKFLOW:
 1. Run this script → Configure API
 2. Use "Discover & Queue Models" → Research and select models
 3. Use "View Queued Models" → Get copy-paste instructions
 4. Go to UI → Add each queued model as Direct Connection
-5. ✅ Start using your OpenRouter models!
+5. Start using your OpenRouter models
 
-💡 WHY THIS APPROACH:
+WHY THIS APPROACH:
 • Security: API key stored in environment variables
 • Performance: Only load models you actually want to use
 • Cost Control: Prevents accidental usage of expensive models
@@ -842,7 +842,7 @@ Step 2: UI Model Addition (Manual Process)
                     self.show_help()
                 elif choice == "9":
                     console.clear()
-                    console.print("👋 Backend configuration complete! Next: Add models in UI", style="bright_green")
+                    console.print("Backend configuration complete. Next: Add models in UI", style="bright_green")
                     break
                 
                 # Reload config after any changes
@@ -850,7 +850,7 @@ Step 2: UI Model Addition (Manual Process)
                 
         except KeyboardInterrupt:
             console.clear()
-            console.print("\n👋 Backend configuration saved. Next: Add models in UI", style="bright_green")
+            console.print("\nBackend configuration saved. Next: Add models in UI", style="bright_green")
 
 if __name__ == "__main__":
     try:
