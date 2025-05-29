@@ -359,3 +359,5 @@ letsencrypt/
 # Ignore VSCode workspace files and cursor directory
 *.code-workspace
 .cursor/
+# OpenRouter virtual environment
+openrouter-manager/
