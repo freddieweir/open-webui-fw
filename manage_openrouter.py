@@ -155,7 +155,7 @@ class OpenRouterManager:
         console.print("1. 🔧 Configure OpenRouter API Authentication")
         console.print("2. 📊 View Current Backend Configuration")
         console.print("3. 🧪 Test OpenRouter API Connection")
-        console.print("4. 🔍 Discover & Queue Models for UI Addition")
+        console.print("4. 🌐 Discover & Queue Models for UI Addition")
         console.print("5. 📋 View Queued Models & Copy Instructions")
         console.print("6. 🐳 Restart Docker Services")
         console.print("7. 📝 Generate .env Template")
@@ -376,7 +376,7 @@ WEBUI_DOCKER_TAG=main
     def discover_and_queue_models(self):
         """Enhanced model discovery with queuing and better descriptions"""
         console.clear()
-        console.print(Panel("🔍 Discover Models & Queue for UI Addition", style="bold bright_blue"))
+        console.print(Panel("🌐 Discover Models & Queue for UI Addition", style="bold bright_blue"))
         
         if not self.config['OPENROUTER_API_KEY']:
             console.print("❌ No API key configured. Please configure the API first.", style="bright_red")
@@ -438,7 +438,7 @@ WEBUI_DOCKER_TAG=main
     def categorize_models(self, models: List[Dict]) -> Dict[str, List[Dict]]:
         """Categorize models by provider and purpose"""
         categories = {
-            "🔍 Web Search & Real-time Info": [],
+            "🌐 Web Search & Real-time Info": [],
             "💬 Conversational AI (GPT-style)": [],
             "🧠 Advanced Reasoning (Claude)": [],
             "🚀 Open Source (Llama, Mistral)": [],
@@ -462,7 +462,7 @@ WEBUI_DOCKER_TAG=main
             
             # Categorize based on model ID and characteristics
             if 'perplexity' in model_id or 'search' in model_id:
-                categories["�� Web Search & Real-time Info"].append(enhanced_model)
+                categories["🌐 Web Search & Real-time Info"].append(enhanced_model)
             elif 'gpt' in model_id or 'openai' in model_id:
                 categories["💬 Conversational AI (GPT-style)"].append(enhanced_model)
             elif 'claude' in model_id or 'anthropic' in model_id:
